@@ -3,7 +3,6 @@ import sys
 import unittest
 import subprocess
 import hashlib
-import shutil
 import string
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), './TextRecognitionDataGenerator')))
@@ -14,7 +13,7 @@ except:
     pass
 
 from TextRecognitionDataGenerator.data_generator import FakeTextDataGenerator
-from TextRecognitionDataGenerator.background_generator import BackgroundGenerator
+from TextRecognitionDataGenerator import background_generator
 from TextRecognitionDataGenerator.string_generator import (
     create_strings_from_file,
     create_strings_from_dict,
@@ -85,7 +84,11 @@ class DataGenerator(unittest.TestCase):
             0,
             -1,
             0,
-            (1, 1)
+            '#010101',
+            0,
+            1,
+            (5,5,5,5),
+            0
         )
 
         self.assertTrue(
@@ -113,7 +116,11 @@ class DataGenerator(unittest.TestCase):
             0,
             -1,
             0,
-            (1, 1)
+            '#010101',
+            0,
+            1,
+            (5,5,5,5),
+            0
         )
 
         self.assertTrue(
@@ -141,7 +148,11 @@ class DataGenerator(unittest.TestCase):
             0,
             -1,
             0,
-            (1, 1)
+            '#010101',
+            0,
+            1,
+            (5,5,5,5),
+            0
         )
 
         self.assertTrue(
@@ -169,7 +180,11 @@ class DataGenerator(unittest.TestCase):
             0,
             -1,
             0,
-            (1, 1)
+            '#010101',
+            0,
+            1,
+            (5,5,5,5),
+            0
         )
 
         self.assertTrue(
@@ -197,7 +212,11 @@ class DataGenerator(unittest.TestCase):
             0,
             -1,
             0,
-            (1, 1)
+            '#010101',
+            0,
+            1,
+            (5,5,5,5),
+            0
         )
 
         self.assertTrue(
@@ -225,7 +244,11 @@ class DataGenerator(unittest.TestCase):
             0,
             -1,
             0,
-            (1, 1)
+            '#010101',
+            0,
+            1,
+            (5,5,5,5),
+            0
         )
 
         self.assertTrue(
@@ -253,7 +276,11 @@ class DataGenerator(unittest.TestCase):
             0,
             600,
             0,
-            (1, 1)
+            '#010101',
+            0,
+            1,
+            (5,5,5,5),
+            0
         )
 
         self.assertTrue(
@@ -281,7 +308,11 @@ class DataGenerator(unittest.TestCase):
             0,
             800,
             1,
-            (1, 1)
+            '#010101',
+            0,
+            1,
+            (5,5,5,5),
+            0
         )
 
         self.assertTrue(
@@ -309,7 +340,11 @@ class DataGenerator(unittest.TestCase):
             0,
             1000,
             2,
-            (1, 1)
+            '#010101',
+            0,
+            1,
+            (5,5,5,5),
+            0
         )
 
         self.assertTrue(
@@ -317,6 +352,194 @@ class DataGenerator(unittest.TestCase):
         )
 
         os.remove('tests/out/TEST TEST TEST_8.jpg')
+
+    def test_raise_if_handwritten_and_vertical(self):
+        try:
+            FakeTextDataGenerator.generate(
+                9,
+                'TEST TEST TEST',
+                'tests/font.ttf',
+                'tests/out/',
+                64,
+                'jpg',
+                0,
+                False,
+                0,
+                False,
+                1,
+                0,
+                0,
+                True,
+                0,
+                1000,
+                2,
+                '#010101',
+                1,
+                1,
+                (5,5,5,5),
+                0
+            )
+            raise Exception("Vertical handwritten did not throw")
+        except ValueError:
+            pass
+
+    def test_generate_vertical_text(self):
+        FakeTextDataGenerator.generate(
+            10,
+            'TEST TEST TEST',
+            'tests/font.ttf',
+            'tests/out/',
+            32,
+            'jpg',
+            0,
+            False,
+            0,
+            False,
+            1,
+            0,
+            0,
+            False,
+            0,
+            -1,
+            0,
+            '#010101',
+            1,
+            1,
+            (5,5,5,5),
+            0
+        )
+
+        self.assertTrue(
+            md5('tests/out/TEST TEST TEST_10.jpg') == md5('tests/expected_results/TEST TEST TEST_10.jpg')
+        )
+
+        os.remove('tests/out/TEST TEST TEST_10.jpg')
+
+    def test_generate_horizontal_text_with_variable_space(self):
+        FakeTextDataGenerator.generate(
+            11,
+            'TEST TEST TEST',
+            'tests/font.ttf',
+            'tests/out/',
+            32,
+            'jpg',
+            0,
+            False,
+            0,
+            False,
+            1,
+            0,
+            0,
+            False,
+            0,
+            -1,
+            0,
+            '#010101',
+            0,
+            4,
+            (5,5,5,5),
+            0
+        )
+
+        self.assertTrue(
+            md5('tests/out/TEST TEST TEST_11.jpg') == md5('tests/expected_results/TEST TEST TEST_11.jpg')
+        )
+
+        os.remove('tests/out/TEST TEST TEST_11.jpg')
+
+    def test_generate_vertical_text_with_variable_space(self):
+        FakeTextDataGenerator.generate(
+            12,
+            'TEST TEST TEST',
+            'tests/font.ttf',
+            'tests/out/',
+            32,
+            'jpg',
+            0,
+            False,
+            0,
+            False,
+            1,
+            0,
+            0,
+            False,
+            0,
+            -1,
+            0,
+            '#010101',
+            1,
+            2,
+            (5,5,5,5),
+            0
+        )
+
+        self.assertTrue(
+            md5('tests/out/TEST TEST TEST_12.jpg') == md5('tests/expected_results/TEST TEST TEST_12.jpg')
+        )
+
+        os.remove('tests/out/TEST TEST TEST_12.jpg')
+
+    def test_generate_text_with_unknown_orientation(self):
+        try:
+            FakeTextDataGenerator.generate(
+                12,
+                'TEST TEST TEST',
+                'tests/font.ttf',
+                'tests/out/',
+                32,
+                'jpg',
+                0,
+                False,
+                0,
+                False,
+                1,
+                0,
+                0,
+                False,
+                0,
+                -1,
+                0,
+                '#010101',
+                100,
+                2,
+                (5,5,5,5),
+                0
+            )
+            raise Exception("Unknown orientation did not throw")
+        except ValueError:
+            pass
+
+    def test_generate_data_with_fit(self):
+        FakeTextDataGenerator.generate(
+            13,
+            'TEST TEST TEST',
+            'tests/font.ttf',
+            'tests/out/',
+            64,
+            'jpg',
+            0,
+            False,
+            0,
+            False,
+            1,
+            0,
+            0,
+            False,
+            0,
+            -1,
+            0,
+            '#010101',
+            0,
+            1,
+            (0,0,0,0),
+            1
+        )
+
+        self.assertTrue(
+            md5('tests/out/TEST TEST TEST_13.jpg') == md5('tests/expected_results/TEST TEST TEST_13.jpg')
+        )
+
+        os.remove('tests/out/TEST TEST TEST_13.jpg')
 
     def test_generate_string_with_letters(self):
         s = create_strings_randomly(1, False, 1, True, False, False, 'en')[0]
@@ -331,7 +554,7 @@ class DataGenerator(unittest.TestCase):
         self.assertTrue(
             all([l in '0123456789' for l in s])
         )
-    
+
     def test_generate_string_with_symbols(self):
         s = create_strings_randomly(1, False, 1, False, False, True, 'en')[0]
         
@@ -349,7 +572,7 @@ class DataGenerator(unittest.TestCase):
         )
 
     def test_generate_data_with_white_background(self):
-        BackgroundGenerator.plain_white(64, 128).save('tests/out/white_background.jpg')
+        background_generator.plain_white(64, 128).convert('RGB').save('tests/out/white_background.jpg')
 
         self.assertTrue(
             md5('tests/out/white_background.jpg') == md5('tests/expected_results/white_background.jpg')
@@ -358,7 +581,7 @@ class DataGenerator(unittest.TestCase):
         os.remove('tests/out/white_background.jpg')
 
     def test_generate_data_with_gaussian_background(self):
-        BackgroundGenerator.gaussian_noise(64, 128).save('tests/out/gaussian_background.jpg')
+        background_generator.gaussian_noise(64, 128).convert('RGB').save('tests/out/gaussian_background.jpg')
 
         self.assertTrue(
             md5('tests/out/gaussian_background.jpg') == md5('tests/expected_results/gaussian_background.jpg')
@@ -367,7 +590,7 @@ class DataGenerator(unittest.TestCase):
         os.remove('tests/out/gaussian_background.jpg')
 
     def test_generate_data_with_quasicrystal_background(self):
-        bkgd = BackgroundGenerator.quasicrystal(64, 128)
+        bkgd = background_generator.quasicrystal(64, 128)
         
         self.assertTrue(
             len(bkgd.histogram()) > 20 and bkgd.size == (128, 64)
@@ -433,6 +656,12 @@ class CommandLineInterface(unittest.TestCase):
         subprocess.Popen(args, cwd="TextRecognitionDataGenerator/").wait()
         with open('tests/out/labels.txt', 'r') as f:
             self.assertTrue(all([c in "!\"#$%&'()*+,-./:;?@[\\]^_`{|}~" for c in f.readline().split(' ')[1][:-1]]))
+        empty_directory('tests/out/')
+
+    def test_handwritten(self):
+        args = ['python3', 'run.py', '-c', '1', '--output_dir', '../tests/out/']
+        subprocess.Popen(args, cwd="TextRecognitionDataGenerator/").wait()
+        self.assertTrue(len(os.listdir('tests/out/')) == 1)
         empty_directory('tests/out/')
 
 #    def test_word_count(self):

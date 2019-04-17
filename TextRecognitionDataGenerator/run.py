@@ -1,7 +1,6 @@
 import argparse
 import os, errno
 import random
-import re
 import string
 
 from tqdm import tqdm
@@ -14,10 +13,11 @@ from string_generator import (
 from data_generator import FakeTextDataGenerator
 from multiprocessing import Pool
 
-def valid_range(s):
-    if len(s.split(',')) > 2:
-        raise argparse.ArgumentError("The given range is invalid, please use ?,? format.")
-    return tuple([int(i) for i in s.split(',')])
+def margins(margin):
+    margins = margin.split(',')
+    if len(margins) == 1:
+        return [margins[0]] * 4
+    return [int(m) for m in margins]
 
 def parse_arguments():
     """
@@ -104,7 +104,7 @@ def parse_arguments():
         "--format",
         type=int,
         nargs="?",
-        help="Define the height of the produced images",
+        help="Define the height of the produced images if horizontal, else the width",
         default=32,
     )
     parser.add_argument(
@@ -214,13 +214,45 @@ def parse_arguments():
         default=1
     )
     parser.add_argument(
+        "-or",
+        "--orientation",
+        type=int,
+        nargs="?",
+        help="Define the orientation of the text. 0: Horizontal, 1: Vertical",
+        default=0
+    )
+    parser.add_argument(
         "-tc",
         "--text_color",
-        type=valid_range,
+        type=str,
         nargs="?",
-        help="Define the text's color, should be either a single integer or a range in the ?,? format.",
-        default=(40,)
+        help="Define the text's color, should be either a single hex color or a range in the ?,? format.",
+        default='#282828'
     )
+    parser.add_argument(
+        "-sw",
+        "--space_width",
+        type=float,
+        nargs="?",
+        help="Define the width of the spaces between words. 2.0 means twice the normal space width",
+        default=1.0
+    )
+    parser.add_argument(
+        "-m",
+        "--margins",
+        type=margins,
+        nargs="?",
+        help="Define the margins around the text when rendered. In pixels",
+        default=(5, 5, 5, 5)
+    )
+    parser.add_argument(
+        "-fi",
+        "--fit",
+        action="store_true",
+        help="Apply a tight crop around the rendered text",
+        default=False
+    )
+
 
     return parser.parse_args()
 
@@ -305,7 +337,11 @@ def main():
             [args.name_format] * string_count,
             [args.width] * string_count,
             [args.alignment] * string_count,
-            [args.text_color] * string_count
+            [args.text_color] * string_count,
+            [args.orientation] * string_count,
+            [args.space_width] * string_count,
+            [args.margins] * string_count,
+            [args.fit] * string_count
         )
     ), total=args.count):
         pass
