@@ -1,7 +1,8 @@
 import argparse
 import os, errno
-import random
+import random as rnd
 import string
+import sys
 
 from tqdm import tqdm
 from string_generator import (
@@ -252,6 +253,13 @@ def parse_arguments():
         help="Apply a tight crop around the rendered text",
         default=False
     )
+    parser.add_argument(
+        "-ft",
+        "--font",
+        type=str,
+        nargs="?",
+        help="Define font to be used"
+    )
 
 
     return parser.parse_args()
@@ -263,7 +271,7 @@ def load_dict(lang):
 
     lang_dict = []
     with open(os.path.join('dicts', lang + '.txt'), 'r', encoding="utf8", errors='ignore') as d:
-        lang_dict = d.readlines()
+        lang_dict = [l for l in d.read().splitlines() if len(l) > 0]
     return lang_dict
 
 def load_fonts(lang):
@@ -295,7 +303,13 @@ def main():
     lang_dict = load_dict(args.language)
 
     # Create font (path) list
-    fonts = load_fonts(args.language)
+    if not args.font:
+        fonts = load_fonts(args.language)
+    else:
+        if os.path.isfile(args.font):
+            fonts = [args.font]
+        else:
+            sys.exit("Cannot open font")
 
     # Creating synthetic sentences (or word)
     strings = []
@@ -322,7 +336,7 @@ def main():
         zip(
             [i for i in range(0, string_count)],
             strings,
-            [fonts[random.randrange(0, len(fonts))] for _ in range(0, string_count)],
+            [fonts[rnd.randrange(0, len(fonts))] for _ in range(0, string_count)],
             [args.output_dir] * string_count,
             [args.format] * string_count,
             [args.extension] * string_count,
